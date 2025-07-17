@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import drillsoftLogo from "../assets/drillsoft-logo.png";
 import Modal from "../components/Modal";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const [usuario, setUsuario] = useState("");
@@ -14,12 +15,19 @@ export default function Login() {
   const handleEntrar = async () => {
     setErro(null);
 
+    if (!usuario || !senha) {
+      toast.error("Preencha usuário e senha.");
+      return;
+    }
+
     try {
-      // Envia o login
       const response = await fetch("http://localhost:3000/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome_usuario: usuario, senha }),
+        body: JSON.stringify({
+          nome_usuario: usuario,
+          senha: senha,
+        }),
       });
 
       const data = await response.json();
@@ -28,16 +36,17 @@ export default function Login() {
         if (data.status === "senha_nao_definida") {
           setMostrarModal(true);
         } else {
-          throw new Error(data.mensagem || "Erro ao fazer login");
+          toast.error(data.mensagem || "Erro ao fazer login.");
         }
         return;
       }
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("usuario", JSON.stringify(data.usuario));
+      toast.success("Login realizado com sucesso!");
       navigate("/dashboard");
     } catch (err) {
-      setErro(err.message);
+      toast.error("Erro inesperado ao fazer login.");
     }
   };
 
@@ -49,7 +58,7 @@ export default function Login() {
 
   const handleDefinirSenha = async () => {
     if (!novaSenha || novaSenha.length < 6) {
-      alert("A senha deve conter no mínimo 6 caracteres.");
+      toast.error("A senha deve conter no mínimo 6 caracteres.");
       return;
     }
 
@@ -64,16 +73,17 @@ export default function Login() {
       });
 
       const data = await response.json();
-      console.log("resposta da API:", data, "status:", response.status);
 
-      if (!response.ok) throw new Error(data.erro || "Erro ao definir senha");
+      if (!response.ok) {
+        throw new Error(data.erro || "Erro ao definir senha");
+      }
 
       setMostrarModal(false);
       setNovaSenha("");
       setSenha("");
-      alert("Senha definida com sucesso. Agora você pode fazer login.");
+      toast.success("Senha definida com sucesso. Agora você pode fazer login.");
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     }
   };
 

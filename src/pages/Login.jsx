@@ -43,6 +43,12 @@ export default function Login() {
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("usuario", JSON.stringify(data.usuario));
+
+      // Define expiração para 8 horas a partir de agora
+      const agora = new Date();
+      const expiraEm = new Date(agora.getTime() + 8 * 60 * 60 * 1000); // 8 horas
+      localStorage.setItem("expira_em", expiraEm.toISOString());
+
       toast.success("Login realizado com sucesso!");
       navigate("/home");
     } catch (err) {

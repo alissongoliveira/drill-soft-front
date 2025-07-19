@@ -11,14 +11,28 @@ const Home = () => {
 
   useEffect(() => {
     const usuarioStorage = JSON.parse(localStorage.getItem("usuario"));
-    setUsuario(usuarioStorage);
+    const expiraEm = localStorage.getItem("expira_em");
+
+    // Verifica se o token está expirado
+    if (expiraEm && new Date() > new Date(expiraEm)) {
+      localStorage.clear();
+      navigate("/");
+      return;
+    }
+
+    if (usuarioStorage) {
+      setUsuario(usuarioStorage);
+    } else {
+      navigate("/"); // caso não tenha usuário logado
+    }
   }, []);
 
   const primeiraLetra = usuario?.nome?.charAt(0).toUpperCase() || "U";
 
   const handleLogout = () => {
     localStorage.removeItem("usuario");
-    navigate("/");
+    localStorage.removeItem("token"); // remove o token salvo, se houver
+    navigate("/"); // redireciona para login
   };
 
   useEffect(() => {

@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import logo from "../assets/drillsoft-logo.png";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import ModalSobre from "../components/ModalSobre";
 
 const Home = () => {
   const [usuario, setUsuario] = useState(null);
   const [menuAberto, setMenuAberto] = useState(false);
+  const [mostrarModalSobre, setMostrarModalSobre] = useState(false);
   const navigate = useNavigate();
   const sidebarRef = useRef(null);
 
@@ -13,7 +15,6 @@ const Home = () => {
     const usuarioStorage = JSON.parse(localStorage.getItem("usuario"));
     const expiraEm = localStorage.getItem("expira_em");
 
-    // Verifica se o token está expirado
     if (expiraEm && new Date() > new Date(expiraEm)) {
       localStorage.clear();
       navigate("/");
@@ -30,8 +31,8 @@ const Home = () => {
   const primeiraLetra = usuario?.nome?.charAt(0).toUpperCase() || "U";
 
   const handleLogout = () => {
-    localStorage.removeItem("usuario");
-    localStorage.removeItem("token"); // remove o token salvo, se houver
+    localStorage.removeItem("usuario"); // remove o token salvo, se houver
+    localStorage.removeItem("token");
     navigate("/"); // redireciona para login
   };
 
@@ -70,7 +71,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Overlay */}
+      {/* Overlay escuro da sidebar */}
       {menuAberto && (
         <div
           className="fixed inset-0 bg-black bg-opacity-20 z-10"
@@ -78,24 +79,33 @@ const Home = () => {
         ></div>
       )}
 
-      {/* Sidebar com animação */}
+      {/* Sidebar */}
       <div
         ref={sidebarRef}
         className={`fixed top-0 left-0 z-20 transform transition-transform duration-300 w-60 ${
           menuAberto ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <Sidebar onClose={() => setMenuAberto(false)} onLogout={handleLogout} />
+        <Sidebar
+          onClose={() => setMenuAberto(false)}
+          onLogout={handleLogout}
+          onSobreClick={() => setMostrarModalSobre(true)}
+        />
       </div>
 
-      {/* Logo Central */}
-      <div className="flex items-center justify-center flex-1">
+      {/* Área útil */}
+      <div className="flex-1 flex items-center justify-center">
         <img
           src={logo}
           alt="Logo DrillSoft"
           className="w-[502px] h-[502px] object-contain"
         />
       </div>
+
+      {/* Modal SOBRE – fora da área útil, z-50 */}
+      {mostrarModalSobre && (
+        <ModalSobre onClose={() => setMostrarModalSobre(false)} />
+      )}
     </div>
   );
 };

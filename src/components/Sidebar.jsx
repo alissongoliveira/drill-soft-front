@@ -6,7 +6,7 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 
-const Sidebar = ({ onClose, onLogout }) => {
+const Sidebar = ({ onClose, onLogout, onSobreClick }) => {
   return (
     <div className="absolute top-12 left-0 bg-white border shadow z-20 w-60">
       <ul className="divide-y text-sm font-['JetBrains_Mono']">
@@ -30,7 +30,10 @@ const Sidebar = ({ onClose, onLogout }) => {
         </li>
         <li
           className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
-          onClick={onClose}
+          onClick={() => {
+            onClose(); // Fecha sidebar
+            onSobreClick(); // Dispara modal
+          }}
         >
           <FaInfoCircle /> Sobre
         </li>

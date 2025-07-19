@@ -1,9 +1,23 @@
-// Permite acessar a rota somente se tiver um token
 import { Navigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-const PrivateRoute = ({ children }) => {
+const PrivateRoute = ({ children, categoriasPermitidas }) => {
   const token = localStorage.getItem("token");
-  return token ? children : <Navigate to="/" />;
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+  if (!token || !usuario) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (
+    categoriasPermitidas &&
+    !categoriasPermitidas.includes(usuario.categoria)
+  ) {
+    toast.error("Acesso negado. Permissão insuficiente.");
+    return <Navigate to="/home" replace />;
+  }
+
+  return children;
 };
 
 export default PrivateRoute;

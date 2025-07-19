@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import {
   FaUser,
   FaClipboardList,
@@ -7,12 +8,17 @@ import {
 } from "react-icons/fa";
 
 const Sidebar = ({ onClose, onLogout, onSobreClick }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="absolute top-12 left-0 bg-white border shadow z-20 w-60">
       <ul className="divide-y text-sm font-['JetBrains_Mono']">
         <li
           className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
-          onClick={onClose}
+          onClick={() => {
+            onClose();
+            navigate("/usuarios");
+          }}
         >
           <FaUser /> Gerenciamento de Usuários
         </li>
@@ -31,8 +37,8 @@ const Sidebar = ({ onClose, onLogout, onSobreClick }) => {
         <li
           className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
           onClick={() => {
-            onClose(); // Fecha sidebar
-            onSobreClick(); // Dispara modal
+            onClose();
+            onSobreClick();
           }}
         >
           <FaInfoCircle /> Sobre

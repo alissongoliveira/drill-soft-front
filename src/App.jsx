@@ -3,6 +3,8 @@ import { ToastContainer, toast } from "react-toastify";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
+import GerenciarUsuarios from "./pages/GerenciarUsuarios";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   const navigate = useNavigate();
@@ -16,7 +18,7 @@ function App() {
         toast.error("Sessão expirada. Faça login novamente.");
         navigate("/");
       }
-    }, 60000); // verifica a cada 1 minuto
+    }, 60000);
 
     return () => clearInterval(interval);
   }, [navigate]);
@@ -26,6 +28,16 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/home" element={<Home />} />
+        <Route
+          path="/usuarios"
+          element={
+            <PrivateRoute
+              categoriasPermitidas={["administrador", "supervisor"]}
+            >
+              <GerenciarUsuarios />
+            </PrivateRoute>
+          }
+        />
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} />
     </>

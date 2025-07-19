@@ -5,37 +5,26 @@ const GerenciarUsuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
 
   useEffect(() => {
-    // Simulação de dados
-    setUsuarios([
-      {
-        id: 1,
-        nome: "João dos Santos",
-        usuario: "João Santos",
-        cpf: "000.000.000-00",
-        categoria: "Operador",
-      },
-      {
-        id: 2,
-        nome: "Jhon Doe Dos Silva",
-        usuario: "JhonD",
-        cpf: "000.000.000-00",
-        categoria: "Supervisor",
-      },
-      {
-        id: 3,
-        nome: "Will Morais",
-        usuario: "Wm",
-        cpf: "000.000.000-00",
-        categoria: "Administrador",
-      },
-      {
-        id: 4,
-        nome: "Pedro Paulo",
-        usuario: "PedroP",
-        cpf: "000.000.000-00",
-        categoria: "Básico",
-      },
-    ]);
+    const fetchUsuarios = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const response = await fetch("http://localhost:3000/api/usuarios", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+        console.log("Dados recebidos da API:", data);
+
+        setUsuarios(data.usuarios);
+      } catch (error) {
+        console.error("Erro ao buscar usuários:", error);
+      }
+    };
+
+    fetchUsuarios();
   }, []);
 
   return (
@@ -74,7 +63,7 @@ const GerenciarUsuarios = () => {
             {usuarios.map((u) => (
               <tr key={u.id} className="border-t">
                 <td className="p-2">{u.nome}</td>
-                <td className="p-2">{u.usuario}</td>
+                <td className="p-2">{u.nome_usuario}</td>
                 <td className="p-2">{u.cpf}</td>
                 <td className="p-2">{u.categoria}</td>
                 <td className="p-2 flex gap-2">

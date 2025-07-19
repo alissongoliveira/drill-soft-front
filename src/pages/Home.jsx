@@ -7,7 +7,7 @@ const Home = () => {
   const [usuario, setUsuario] = useState(null);
   const [menuAberto, setMenuAberto] = useState(false);
   const navigate = useNavigate();
-  const sidebarRef = useRef(null); // <-- Aqui
+  const sidebarRef = useRef(null);
 
   useEffect(() => {
     const usuarioStorage = JSON.parse(localStorage.getItem("usuario"));
@@ -21,7 +21,6 @@ const Home = () => {
     navigate("/");
   };
 
-  // ⛔ Detectar clique fora da Sidebar
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
@@ -41,9 +40,9 @@ const Home = () => {
   }, [menuAberto]);
 
   return (
-    <div className="min-h-screen bg-white font-['JetBrains_Mono'] flex flex-col">
+    <div className="min-h-screen bg-white font-['JetBrains_Mono'] flex flex-col relative">
       {/* Top Bar */}
-      <div className="flex items-center justify-between px-4 py-2 bg-gray-300 shadow relative z-10">
+      <div className="flex items-center justify-between px-4 py-2 bg-gray-300 shadow relative z-20">
         <div className="flex items-center gap-4">
           <button
             onClick={() => setMenuAberto(!menuAberto)}
@@ -57,15 +56,23 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Sidebar */}
+      {/* Overlay */}
       {menuAberto && (
-        <div ref={sidebarRef}>
-          <Sidebar
-            onClose={() => setMenuAberto(false)}
-            onLogout={handleLogout}
-          />
-        </div>
+        <div
+          className="fixed inset-0 bg-black bg-opacity-20 z-10"
+          onClick={() => setMenuAberto(false)}
+        ></div>
       )}
+
+      {/* Sidebar com animação */}
+      <div
+        ref={sidebarRef}
+        className={`fixed top-0 left-0 z-20 transform transition-transform duration-300 w-60 ${
+          menuAberto ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <Sidebar onClose={() => setMenuAberto(false)} onLogout={handleLogout} />
+      </div>
 
       {/* Logo Central */}
       <div className="flex items-center justify-center flex-1">

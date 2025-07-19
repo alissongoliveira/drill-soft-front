@@ -44,7 +44,7 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("usuario", JSON.stringify(data.usuario));
       toast.success("Login realizado com sucesso!");
-      navigate("/dashboard");
+      navigate("/home");
     } catch (err) {
       toast.error("Erro inesperado ao fazer login.");
     }

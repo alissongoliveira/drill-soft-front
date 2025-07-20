@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FiPlus, FiFilter, FiPrinter, FiTrash2, FiEdit } from "react-icons/fi";
+import { toast } from "react-toastify";
 import ModalCriarUsuario from "../components/ModalCriarUsuario";
 
 const GerenciarUsuarios = () => {
@@ -28,6 +29,35 @@ const GerenciarUsuarios = () => {
   useEffect(() => {
     fetchUsuarios();
   }, []);
+
+  const handleExcluirUsuario = async (id) => {
+    const confirmar = window.confirm(
+      "Tem certeza que deseja excluir este usuário?"
+    );
+    if (!confirmar) return;
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(`http://localhost:3000/api/usuarios/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const erro = await response.text();
+        throw new Error(erro || "Erro ao excluir usuário");
+      }
+
+      toast.success("Usuário excluído com sucesso!");
+      fetchUsuarios(); // atualiza lista
+    } catch (error) {
+      console.error("Erro ao excluir:", error);
+      toast.error("Erro ao excluir usuário.");
+    }
+  };
 
   return (
     <div className="p-6 font-['JetBrains_Mono']">
@@ -72,7 +102,7 @@ const GerenciarUsuarios = () => {
                 <td className="p-2">{u.cpf}</td>
                 <td className="p-2">{u.categoria}</td>
                 <td className="p-2 flex gap-2">
-                  <button>
+                  <button onClick={() => handleExcluirUsuario(u.id)}>
                     <FiTrash2 size={16} />
                   </button>
                   <button>

@@ -1,29 +1,31 @@
 import { useState, useEffect } from "react";
 import { FiPlus, FiFilter, FiPrinter, FiTrash2, FiEdit } from "react-icons/fi";
+import ModalCriarUsuario from "../components/ModalCriarUsuario";
 
 const GerenciarUsuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
+  const [mostrarModal, setMostrarModal] = useState(false);
+
+  const fetchUsuarios = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch("http://localhost:3000/api/usuarios", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+      console.log("Dados recebidos da API:", data);
+
+      setUsuarios(data.usuarios);
+    } catch (error) {
+      console.error("Erro ao buscar usuários:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchUsuarios = async () => {
-      try {
-        const token = localStorage.getItem("token");
-
-        const response = await fetch("http://localhost:3000/api/usuarios", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const data = await response.json();
-        console.log("Dados recebidos da API:", data);
-
-        setUsuarios(data.usuarios);
-      } catch (error) {
-        console.error("Erro ao buscar usuários:", error);
-      }
-    };
-
     fetchUsuarios();
   }, []);
 
@@ -36,7 +38,10 @@ const GerenciarUsuarios = () => {
 
       {/* Botões */}
       <div className="flex gap-2 mt-4">
-        <button className="bg-white border px-3 py-1 flex items-center gap-1 shadow">
+        <button
+          className="bg-white border px-3 py-1 flex items-center gap-1 shadow"
+          onClick={() => setMostrarModal(true)}
+        >
           <FiPlus size={16} /> NOVO USUÁRIO
         </button>
         <button className="bg-white border px-3 py-1 flex items-center gap-1 shadow">
@@ -79,6 +84,14 @@ const GerenciarUsuarios = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Modal de criação */}
+      {mostrarModal && (
+        <ModalCriarUsuario
+          onClose={() => setMostrarModal(false)}
+          onSuccess={fetchUsuarios}
+        />
+      )}
     </div>
   );
 };

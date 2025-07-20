@@ -3,11 +3,13 @@ import { FiPlus, FiFilter, FiPrinter, FiTrash2, FiEdit } from "react-icons/fi";
 import { toast } from "react-toastify";
 import ModalCriarUsuario from "../components/ModalCriarUsuario";
 import ModalConfirmarExclusao from "../components/ModalConfirmarExclusao";
+import ModalEditarUsuario from "../components/ModalEditarUsuario";
 
 const GerenciarUsuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [usuarioParaExcluir, setUsuarioParaExcluir] = useState(null);
+  const [usuarioParaEditar, setUsuarioParaEditar] = useState(null);
 
   const fetchUsuarios = async () => {
     try {
@@ -106,7 +108,7 @@ const GerenciarUsuarios = () => {
                   <button onClick={() => setUsuarioParaExcluir(u)}>
                     <FiTrash2 size={16} />
                   </button>
-                  <button>
+                  <button onClick={() => setUsuarioParaEditar(u)}>
                     <FiEdit size={16} />
                   </button>
                 </td>
@@ -121,6 +123,18 @@ const GerenciarUsuarios = () => {
         <ModalCriarUsuario
           onClose={() => setMostrarModal(false)}
           onSuccess={fetchUsuarios}
+        />
+      )}
+
+      {/* Modal de edição */}
+      {usuarioParaEditar && (
+        <ModalEditarUsuario
+          usuario={usuarioParaEditar}
+          onClose={() => setUsuarioParaEditar(null)}
+          onSuccess={() => {
+            setUsuarioParaEditar(null);
+            fetchUsuarios();
+          }}
         />
       )}
 

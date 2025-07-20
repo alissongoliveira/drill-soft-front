@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const ModalCriarUsuario = ({ onClose, onSuccess }) => {
   const [form, setForm] = useState({
@@ -35,6 +36,7 @@ const ModalCriarUsuario = ({ onClose, onSuccess }) => {
         throw new Error(erro || "Erro ao criar usuário");
       }
 
+      toast.success("Usuário criado com sucesso!");
       onSuccess(); // Atualiza lista no pai
       onClose(); // Fecha modal
     } catch (error) {

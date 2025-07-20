@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { FiPlus, FiFilter, FiPrinter, FiTrash2, FiEdit } from "react-icons/fi";
 import { toast } from "react-toastify";
 import ModalCriarUsuario from "../components/ModalCriarUsuario";
+import ModalConfirmarExclusao from "../components/ModalConfirmarExclusao";
 
 const GerenciarUsuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [usuarioParaExcluir, setUsuarioParaExcluir] = useState(null);
 
   const fetchUsuarios = async () => {
     try {
@@ -18,8 +20,6 @@ const GerenciarUsuarios = () => {
       });
 
       const data = await response.json();
-      console.log("Dados recebidos da API:", data);
-
       setUsuarios(data.usuarios);
     } catch (error) {
       console.error("Erro ao buscar usuários:", error);
@@ -30,21 +30,21 @@ const GerenciarUsuarios = () => {
     fetchUsuarios();
   }, []);
 
-  const handleExcluirUsuario = async (id) => {
-    const confirmar = window.confirm(
-      "Tem certeza que deseja excluir este usuário?"
-    );
-    if (!confirmar) return;
+  const handleConfirmarExclusao = async () => {
+    if (!usuarioParaExcluir) return;
 
     try {
       const token = localStorage.getItem("token");
 
-      const response = await fetch(`http://localhost:3000/api/usuarios/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/usuarios/${usuarioParaExcluir.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         const erro = await response.text();
@@ -52,7 +52,8 @@ const GerenciarUsuarios = () => {
       }
 
       toast.success("Usuário excluído com sucesso!");
-      fetchUsuarios(); // atualiza lista
+      setUsuarioParaExcluir(null);
+      fetchUsuarios();
     } catch (error) {
       console.error("Erro ao excluir:", error);
       toast.error("Erro ao excluir usuário.");
@@ -102,7 +103,7 @@ const GerenciarUsuarios = () => {
                 <td className="p-2">{u.cpf}</td>
                 <td className="p-2">{u.categoria}</td>
                 <td className="p-2 flex gap-2">
-                  <button onClick={() => handleExcluirUsuario(u.id)}>
+                  <button onClick={() => setUsuarioParaExcluir(u)}>
                     <FiTrash2 size={16} />
                   </button>
                   <button>
@@ -120,6 +121,15 @@ const GerenciarUsuarios = () => {
         <ModalCriarUsuario
           onClose={() => setMostrarModal(false)}
           onSuccess={fetchUsuarios}
+        />
+      )}
+
+      {/* Modal de confirmação de exclusão */}
+      {usuarioParaExcluir && (
+        <ModalConfirmarExclusao
+          nomeUsuario={usuarioParaExcluir.nome}
+          onClose={() => setUsuarioParaExcluir(null)}
+          onConfirm={handleConfirmarExclusao}
         />
       )}
     </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FiPlus, FiFilter, FiPrinter, FiTrash2, FiEdit } from "react-icons/fi";
+import { FiPlus, FiPrinter, FiTrash2, FiEdit } from "react-icons/fi";
 import { toast } from "react-toastify";
 import ModalCriarUsuario from "../components/ModalCriarUsuario";
 import ModalConfirmarExclusao from "../components/ModalConfirmarExclusao";
@@ -77,10 +77,10 @@ const GerenciarUsuarios = () => {
         >
           <FiPlus size={16} /> NOVO USUÁRIO
         </button>
-        <button className="bg-white border px-3 py-1 flex items-center gap-1 shadow">
-          <FiFilter size={16} /> FILTROS
-        </button>
-        <button className="bg-white border px-3 py-1 flex items-center gap-1 shadow">
+        <button
+          className="bg-white border px-3 py-1 flex items-center gap-1 shadow"
+          onClick={() => window.print()}
+        >
           <FiPrinter size={16} /> IMPRIMIR
         </button>
       </div>

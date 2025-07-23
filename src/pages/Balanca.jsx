@@ -3,18 +3,52 @@ import { FiSettings } from "react-icons/fi";
 import io from "socket.io-client";
 import ModalSolicitacaoComplemento from "../components/ModalSolicitacaoComplemento";
 import ModalEditarDadosBalanca from "../components/ModalEditarDadosBalanca";
+import ModalCriarBalanca from "../components/ModalCriarBalanca";
+import { toast } from "react-toastify";
 
-const socket = io("http://localhost:3000"); // IP
+const socket = io("http://localhost:3000");
 
 const Balanca = () => {
-  const [balancas, setBalancas] = useState([
-    { id: 1, nome: "BALANÇA 01", status: true, peso: 0 },
-    { id: 2, nome: "BALANÇA 02", status: true, peso: 0 },
-  ]);
-
+  const [balancas, setBalancas] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
+  const [mostrarModalCriar, setMostrarModalCriar] = useState(false);
   const [balancaSelecionada, setBalancaSelecionada] = useState(null);
+
+  // Carrega balanças do banco
+  const fetchBalancas = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch("http://localhost:3000/api/balancas", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.balancas.length === 0) {
+        setMostrarModalCriar(true);
+      }
+
+      // adiciona status e peso manualmente
+      const lista = data.balancas.map((b) => ({
+        ...b,
+        status: true,
+        peso: 0,
+      }));
+
+      setBalancas(lista);
+    } catch (error) {
+      console.error("Erro ao carregar balanças:", error);
+      toast.error("Erro ao buscar balanças.");
+    }
+  };
+
+  useEffect(() => {
+    fetchBalancas();
+  }, []);
 
   useEffect(() => {
     socket.on("peso-balanca-1", (peso) => {
@@ -53,11 +87,21 @@ const Balanca = () => {
 
   return (
     <div className="p-6 font-['JetBrains_Mono']">
-      <h1 className="text-xl font-bold">Balança</h1>
-      <p className="text-sm text-gray-600 mb-6">
-        Monitore os pesos em tempo real e envie solicitações de complementos aos
-        operadores.
-      </p>
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h1 className="text-xl font-bold">Balança</h1>
+          <p className="text-sm text-gray-600">
+            Monitore os pesos em tempo real e envie solicitações de complementos
+            aos operadores.
+          </p>
+        </div>
+        <button
+          className="bg-white border px-4 py-1 shadow text-sm h-fit"
+          onClick={() => setMostrarModalCriar(true)}
+        >
+          + Nova Balança
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {balancas.map((b) => (
@@ -106,6 +150,14 @@ const Balanca = () => {
         ))}
       </div>
 
+      {/* Modal Criar Balança */}
+      {mostrarModalCriar && (
+        <ModalCriarBalanca
+          onClose={() => setMostrarModalCriar(false)}
+          onSuccess={fetchBalancas}
+        />
+      )}
+
       {/* Modal de Solicitação */}
       {mostrarModal && balancaSelecionada && (
         <ModalSolicitacaoComplemento
@@ -126,10 +178,7 @@ const Balanca = () => {
             setMostrarModalEditar(false);
             setBalancaSelecionada(null);
           }}
-          onSuccess={() => {
-            setMostrarModalEditar(false);
-            setBalancaSelecionada(null);
-          }}
+          onSuccess={fetchBalancas}
         />
       )}
     </div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const ModalSolicitacaoComplemento = ({ balanca, onClose, onSuccess }) => {
   const [placa, setPlaca] = useState("");
@@ -30,14 +31,15 @@ const ModalSolicitacaoComplemento = ({ balanca, onClose, onSuccess }) => {
 
       if (!response.ok) {
         const erro = await response.text();
-        throw new Error(erro);
+        throw new Error(erro || "Erro ao enviar solicitação");
       }
 
+      toast.success("Solicitação enviada com sucesso!");
       onSuccess();
       onClose();
     } catch (error) {
       console.error("Erro ao enviar solicitação:", error);
-      alert("Erro ao enviar solicitação");
+      toast.error("Erro ao enviar solicitação.");
     }
   };
 

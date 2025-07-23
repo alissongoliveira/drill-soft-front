@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { FiSettings } from "react-icons/fi";
 import io from "socket.io-client";
+import ModalSolicitacaoComplemento from "../components/ModalSolicitacaoComplemento";
 
-const socket = io("http://localhost:3000"); // IP/backend
+const socket = io("http://localhost:3000"); // IP
 
 const Balanca = () => {
   const [balancas, setBalancas] = useState([
@@ -10,8 +11,10 @@ const Balanca = () => {
     { id: 2, nome: "BALANÇA 02", status: true, peso: 0 },
   ]);
 
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [balancaSelecionada, setBalancaSelecionada] = useState(null);
+
   useEffect(() => {
-    // Recebe os pesos por canal individual
     socket.on("peso-balanca-1", (peso) => {
       setBalancas((prev) =>
         prev.map((b) => (b.id === 1 && b.status ? { ...b, peso } : b))
@@ -34,6 +37,11 @@ const Balanca = () => {
     setBalancas((prev) =>
       prev.map((b) => (b.id === id ? { ...b, status: !b.status } : b))
     );
+  };
+
+  const abrirModal = (balanca) => {
+    setBalancaSelecionada(balanca);
+    setMostrarModal(true);
   };
 
   return (
@@ -78,13 +86,28 @@ const Balanca = () => {
 
             {/* Botão */}
             <div className="mt-6 flex justify-center">
-              <button className="bg-white border px-4 py-2 shadow text-sm">
+              <button
+                className="bg-white border px-4 py-2 shadow text-sm"
+                onClick={() => abrirModal(b)}
+              >
                 Solicitar Complemento
               </button>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Modal de Solicitação */}
+      {mostrarModal && balancaSelecionada && (
+        <ModalSolicitacaoComplemento
+          balanca={balancaSelecionada.id}
+          onClose={() => {
+            setMostrarModal(false);
+            setBalancaSelecionada(null);
+          }}
+          onSuccess={() => {}}
+        />
+      )}
     </div>
   );
 };

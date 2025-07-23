@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import GerenciarUsuarios from "./pages/GerenciarUsuarios";
 import PrivateRoute from "./components/PrivateRoute";
+import Balanca from "./pages/Balanca";
 
 function App() {
   const navigate = useNavigate();
@@ -35,6 +36,16 @@ function App() {
               categoriasPermitidas={["administrador", "supervisor"]}
             >
               <GerenciarUsuarios />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/balanca"
+          element={
+            <PrivateRoute
+              categoriasPermitidas={["administrador", "supervisor"]}
+            >
+              <Balanca />
             </PrivateRoute>
           }
         />

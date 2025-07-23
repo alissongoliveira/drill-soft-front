@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FiSettings } from "react-icons/fi";
 import io from "socket.io-client";
 import ModalSolicitacaoComplemento from "../components/ModalSolicitacaoComplemento";
+import ModalEditarDadosBalanca from "../components/ModalEditarDadosBalanca";
 
 const socket = io("http://localhost:3000"); // IP
 
@@ -12,6 +13,7 @@ const Balanca = () => {
   ]);
 
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
   const [balancaSelecionada, setBalancaSelecionada] = useState(null);
 
   useEffect(() => {
@@ -39,9 +41,14 @@ const Balanca = () => {
     );
   };
 
-  const abrirModal = (balanca) => {
+  const abrirModalSolicitacao = (balanca) => {
     setBalancaSelecionada(balanca);
     setMostrarModal(true);
+  };
+
+  const abrirModalEditar = (balanca) => {
+    setBalancaSelecionada(balanca);
+    setMostrarModalEditar(true);
   };
 
   return (
@@ -73,7 +80,9 @@ const Balanca = () => {
 
             {/* Ícone de config */}
             <div className="absolute top-4 right-4">
-              <FiSettings size={18} />
+              <button onClick={() => abrirModalEditar(b)}>
+                <FiSettings size={18} />
+              </button>
             </div>
 
             {/* Nome */}
@@ -88,7 +97,7 @@ const Balanca = () => {
             <div className="mt-6 flex justify-center">
               <button
                 className="bg-white border px-4 py-2 shadow text-sm"
-                onClick={() => abrirModal(b)}
+                onClick={() => abrirModalSolicitacao(b)}
               >
                 Solicitar Complemento
               </button>
@@ -106,6 +115,21 @@ const Balanca = () => {
             setBalancaSelecionada(null);
           }}
           onSuccess={() => {}}
+        />
+      )}
+
+      {/* Modal de Edição */}
+      {mostrarModalEditar && balancaSelecionada && (
+        <ModalEditarDadosBalanca
+          idBalanca={balancaSelecionada.id}
+          onClose={() => {
+            setMostrarModalEditar(false);
+            setBalancaSelecionada(null);
+          }}
+          onSuccess={() => {
+            setMostrarModalEditar(false);
+            setBalancaSelecionada(null);
+          }}
         />
       )}
     </div>

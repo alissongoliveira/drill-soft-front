@@ -14,8 +14,13 @@ const Balanca = () => {
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
   const [mostrarModalCriar, setMostrarModalCriar] = useState(false);
   const [balancaSelecionada, setBalancaSelecionada] = useState(null);
+  const [usuario, setUsuario] = useState(null);
 
-  // Carrega balanças do banco
+  useEffect(() => {
+    const dadosUsuario = JSON.parse(localStorage.getItem("usuario"));
+    setUsuario(dadosUsuario);
+  }, []);
+
   const fetchBalancas = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -32,7 +37,6 @@ const Balanca = () => {
         setMostrarModalCriar(true);
       }
 
-      // adiciona status e peso manualmente
       const lista = data.balancas.map((b) => ({
         ...b,
         status: true,
@@ -85,6 +89,10 @@ const Balanca = () => {
     setMostrarModalEditar(true);
   };
 
+  const podeEditar =
+    usuario?.categoria === "administrador" ||
+    usuario?.categoria === "supervisor";
+
   return (
     <div className="p-6 font-['JetBrains_Mono']">
       <div className="flex items-center justify-between mb-4">
@@ -95,12 +103,14 @@ const Balanca = () => {
             aos operadores.
           </p>
         </div>
-        <button
-          className="bg-white border px-4 py-1 shadow text-sm h-fit"
-          onClick={() => setMostrarModalCriar(true)}
-        >
-          + Nova Balança
-        </button>
+        {podeEditar && (
+          <button
+            className="bg-white border px-4 py-1 shadow text-sm h-fit"
+            onClick={() => setMostrarModalCriar(true)}
+          >
+            + Nova Balança
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -109,7 +119,6 @@ const Balanca = () => {
             key={b.id}
             className="bg-white rounded-md shadow-md p-4 relative"
           >
-            {/* Status */}
             <button
               onClick={() => alternarStatus(b.id)}
               className="absolute top-4 left-4 flex items-center gap-1 border px-2 py-0.5 rounded shadow text-sm"
@@ -122,22 +131,20 @@ const Balanca = () => {
               {b.status ? "Online" : "Offline"}
             </button>
 
-            {/* Ícone de config */}
-            <div className="absolute top-4 right-4">
-              <button onClick={() => abrirModalEditar(b)}>
-                <FiSettings size={18} />
-              </button>
-            </div>
+            {podeEditar && (
+              <div className="absolute top-4 right-4">
+                <button onClick={() => abrirModalEditar(b)}>
+                  <FiSettings size={18} />
+                </button>
+              </div>
+            )}
 
-            {/* Nome */}
             <h2 className="text-center font-bold mb-4 mt-2">{b.nome}</h2>
 
-            {/* Peso */}
             <div className="text-6xl font-bold text-center tracking-widest select-none">
               {b.peso}
             </div>
 
-            {/* Botão */}
             <div className="mt-6 flex justify-center">
               <button
                 className="bg-white border px-4 py-2 shadow text-sm"
@@ -150,7 +157,6 @@ const Balanca = () => {
         ))}
       </div>
 
-      {/* Modal Criar Balança */}
       {mostrarModalCriar && (
         <ModalCriarBalanca
           onClose={() => setMostrarModalCriar(false)}
@@ -158,7 +164,6 @@ const Balanca = () => {
         />
       )}
 
-      {/* Modal de Solicitação */}
       {mostrarModal && balancaSelecionada && (
         <ModalSolicitacaoComplemento
           balanca={balancaSelecionada.id}
@@ -170,7 +175,6 @@ const Balanca = () => {
         />
       )}
 
-      {/* Modal de Edição */}
       {mostrarModalEditar && balancaSelecionada && (
         <ModalEditarDadosBalanca
           idBalanca={balancaSelecionada.id}

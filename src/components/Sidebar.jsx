@@ -24,7 +24,10 @@ const Sidebar = ({ onClose, onLogout, onSobreClick }) => {
         </li>
         <li
           className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
-          onClick={onClose}
+          onClick={() => {
+            onClose();
+            navigate("/solicitacoes");
+          }}
         >
           <FaClipboardList /> Gerenciamento de Solicitações
         </li>

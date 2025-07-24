@@ -11,19 +11,32 @@ const statusColors = {
 
 const GerenciarSolicitacoes = () => {
   const [solicitacoes, setSolicitacoes] = useState([]);
+  const [dataInicio, setDataInicio] = useState("");
+  const [dataFim, setDataFim] = useState("");
+  const [status, setStatus] = useState("");
 
   const fetchSolicitacoes = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await fetch(
-        "http://localhost:3000/api/solicitacoes/todas",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      let url = "http://localhost:3000/api/solicitacoes/todas";
+
+      const filtros = [];
+      if (status) filtros.push(`status=${status}`);
+      if (dataInicio) filtros.push(`data_inicio=${dataInicio}`);
+      if (dataFim) filtros.push(`data_fim=${dataFim}`);
+
+      if (filtros.length > 0) {
+        url = `http://localhost:3000/api/relatorios/solicitacoes?${filtros.join(
+          "&"
+        )}`;
+      }
+
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const data = await response.json();
       setSolicitacoes(data.solicitacoes || []);
@@ -50,14 +63,36 @@ const GerenciarSolicitacoes = () => {
 
       {/* Filtros e ações */}
       <div className="flex flex-wrap gap-2 mb-4">
-        <button className="flex items-center gap-2 border px-3 py-1 shadow text-sm">
-          📅 DATA INICIAL
-        </button>
-        <button className="flex items-center gap-2 border px-3 py-1 shadow text-sm">
-          📅 DATA FINAL
-        </button>
-        <button className="flex items-center gap-2 border px-3 py-1 shadow text-sm">
-          <FiFilter /> FILTROS
+        <input
+          type="date"
+          value={dataInicio}
+          onChange={(e) => setDataInicio(e.target.value)}
+          className="border px-3 py-1 text-sm shadow"
+        />
+        <input
+          type="date"
+          value={dataFim}
+          onChange={(e) => setDataFim(e.target.value)}
+          className="border px-3 py-1 text-sm shadow"
+        />
+
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="border px-3 py-1 text-sm shadow"
+        >
+          <option value="">Todos os Status</option>
+          <option value="pendente">Pendente</option>
+          <option value="aceito">Aceito</option>
+          <option value="finalizado">Finalizado</option>
+          <option value="recusado">Recusado</option>
+        </select>
+
+        <button
+          onClick={fetchSolicitacoes}
+          className="flex items-center gap-2 border px-3 py-1 shadow text-sm"
+        >
+          <FiFilter /> FILTRAR
         </button>
         <button className="flex items-center gap-2 border px-3 py-1 shadow text-sm">
           <FiPrinter /> IMPRIMIR
@@ -66,7 +101,6 @@ const GerenciarSolicitacoes = () => {
 
       {/* Tabela */}
       <div className="bg-white border rounded-md overflow-x-auto">
-        {/* Cabeçalho da tabela */}
         <div className="grid grid-cols-9 text-xs font-bold border-b px-4 py-2">
           <div>BALANÇA</div>
           <div>D. SOLICITAÇÃO</div>
@@ -78,7 +112,6 @@ const GerenciarSolicitacoes = () => {
           <div>STATUS</div>
         </div>
 
-        {/* Linhas da tabela */}
         {solicitacoes.map((s) => (
           <div
             key={s.id}

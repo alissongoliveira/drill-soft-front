@@ -94,7 +94,10 @@ const GerenciarSolicitacoes = () => {
         >
           <FiFilter /> FILTRAR
         </button>
-        <button className="flex items-center gap-2 border px-3 py-1 shadow text-sm">
+        <button
+          onClick={() => window.print()}
+          className="flex items-center gap-2 border px-3 py-1 shadow text-sm"
+        >
           <FiPrinter /> IMPRIMIR
         </button>
       </div>

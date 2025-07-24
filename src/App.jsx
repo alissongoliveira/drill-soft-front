@@ -43,7 +43,7 @@ function App() {
           path="/balanca"
           element={
             <PrivateRoute
-              categoriasPermitidas={["administrador", "supervisor"]}
+              categoriasPermitidas={["administrador", "supervisor", "basico"]}
             >
               <Balanca />
             </PrivateRoute>
